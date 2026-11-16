@@ -81,11 +81,12 @@ app.post('/api/checkout', async (req,res) => {
       })
     });
     const charge = order.charges?.[0] || {};
-    const pix = charge.payment_method?.pix || charge;
-    const qr = charge.qr_code || pix.qr_code || {};
+    // Na API Order do PagBank, qr_code e links ficam diretamente na cobrança.
+    const qr = charge.qr_code || {};
+    const qrImage = charge.links?.find(x=>x.rel==='QRCODE.PNG')?.href || null;
     const {error:updateError} = await supabase.from('qi_attempts').update({pagbank_order_id:order.id}).eq('id',attemptId);
     if (updateError) throw updateError;
-    res.json({attemptId,orderId:order.id,copyPaste:qr.text||null,qrImage:qr.links?.find(x=>x.rel==='QRCODE.PNG')?.href||null,status:charge.status||'WAITING'});
+    res.json({attemptId,orderId:order.id,copyPaste:qr.text||null,qrImage,status:charge.status||'WAITING'});
   } catch (error) {
     console.error('checkout:',error);
     res.status(500).json({error:'Nao foi possivel gerar o PIX. Tente novamente.'});
