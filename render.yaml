@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: desafio-de-qi
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PAGBANK_ENV
+        value: production
+      - key: APP_BASE_URL
+        sync: false
+      - key: PAGBANK_TOKEN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
