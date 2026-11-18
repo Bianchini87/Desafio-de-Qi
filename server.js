@@ -45,8 +45,8 @@ app.get('/api/questions', async (_req,res) => {
 });
 
 function isValidCPF(value) {
-  const cpf = String(value || '').replace(/\\D/g, '');
-  if (cpf.length !== 11 || /^(\\d)\\1{10}$/.test(cpf)) return false;
+  const cpf = String(value || '').replace(/\D/g, '');
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
   let sum = 0;
   for (let i = 0; i < 9; i++) sum += Number(cpf[i]) * (10 - i);
   let digit = (sum * 10) % 11;
@@ -75,6 +75,8 @@ app.post('/api/checkout', async (req,res) => {
     if (!process.env.PAGBANK_TOKEN) return res.status(503).json({error:'Pagamento ainda nao configurado.'});
     const {name,email,cpf,answers} = req.body || {};
     if (!name || String(name).trim().length < 2 || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({error:'Informe nome e e-mail validos.'});
+    const cpfDigits = String(cpf || '').replace(/\D/g, '');
+    if (!isValidCPF(cpfDigits)) return res.status(400).json({error:'Informe um CPF válido com 11 dígitos.'});
     if (!Array.isArray(answers) || answers.length !== 25 || answers.some(x=>!Number.isInteger(x)||x<0||x>3)) return res.status(400).json({error:'Responda as 25 perguntas antes de continuar.'});
     const questionRows = await loadQuestions();
     const score = answers.reduce((sum,answer,i)=>sum+(answer === 'ABCD'.indexOf(String(questionRows[i].correct_answer).toUpperCase()) ? 1 : 0),0);
@@ -87,7 +89,7 @@ app.post('/api/checkout', async (req,res) => {
       method:'POST',
       body:JSON.stringify({
         reference_id:attemptId,
-        customer:{name:String(name).trim().slice(0,100),email:String(email).trim().toLowerCase(),tax_id:String(cpf).replace(/\\D/g,'')},
+        customer:{name:String(name).trim().slice(0,100),email:String(email).trim().toLowerCase(),tax_id:cpfDigits},
         items:[{reference_id:'desafio-qi-25',name:'Desafio de QI - Teste com 25 perguntas',quantity:1,unit_amount:PRICE_CENTS}],
         charges:[{description:'Acesso ao resultado do Desafio de QI',amount:{value:PRICE_CENTS,currency:'BRL'},payment_method:{type:'PIX',pix:{expiration_date:new Date(Date.now()+30*60*1000).toISOString()}}}],
         notification_urls:[baseUrl.replace(/\/$/,'')+'/api/pagbank/webhook']
