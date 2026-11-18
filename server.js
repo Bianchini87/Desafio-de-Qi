@@ -77,8 +77,6 @@ app.post('/api/checkout', async (req,res) => {
     const cpfDigits = String(cpf || '').replace(/\D/g, '');
     if (!isValidCPF(cpfDigits)) return res.status(400).json({error:'Informe um CPF válido com 11 dígitos.'});
     if (!name || String(name).trim().length < 2 || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({error:'Informe nome e e-mail validos.'});
-    const cpfDigits = String(cpf || '').replace(/\D/g, '');
-    if (!isValidCPF(cpfDigits)) return res.status(400).json({error:'Informe um CPF válido com 11 dígitos.'});
     if (!Array.isArray(answers) || answers.length !== 25 || answers.some(x=>!Number.isInteger(x)||x<0||x>3)) return res.status(400).json({error:'Responda as 25 perguntas antes de continuar.'});
     const questionRows = await loadQuestions();
     const score = answers.reduce((sum,answer,i)=>sum+(answer === 'ABCD'.indexOf(String(questionRows[i].correct_answer).toUpperCase()) ? 1 : 0),0);
