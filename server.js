@@ -74,6 +74,8 @@ app.post('/api/checkout', async (req,res) => {
     if (!supabase) return res.status(503).json({error:'Banco de dados ainda nao configurado.'});
     if (!process.env.PAGBANK_TOKEN) return res.status(503).json({error:'Pagamento ainda nao configurado.'});
     const {name,email,cpf,answers} = req.body || {};
+    const cpfDigits = String(cpf || '').replace(/\D/g, '');
+    if (!isValidCPF(cpfDigits)) return res.status(400).json({error:'Informe um CPF válido com 11 dígitos.'});
     if (!name || String(name).trim().length < 2 || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({error:'Informe nome e e-mail validos.'});
     const cpfDigits = String(cpf || '').replace(/\D/g, '');
     if (!isValidCPF(cpfDigits)) return res.status(400).json({error:'Informe um CPF válido com 11 dígitos.'});
