@@ -83,7 +83,7 @@ app.post('/api/checkout', async (req,res) => {
     const attemptId = crypto.randomUUID();
     const baseUrl = process.env.APP_BASE_URL;
     if (!baseUrl) return res.status(503).json({error:'APP_BASE_URL nao configurada no servidor.'});
-    const {error:dbError} = await supabase.from('qi_attempts').insert({id:attemptId,buyer_name:String(name).trim().slice(0,100),buyer_email:String(email).trim().toLowerCase(),answers,score,total:25});
+    const {error:dbError} = await supabase.from('qi_attempts').insert({id:attemptId,buyer_name:String(name).trim().slice(0,100),buyer_email:String(email).trim().toLowerCase(),answers,score,total:25,payment_status:'WAITING'});
     if (dbError) throw dbError;
     const order = await pagbankRequest(PAGBANK_BASE+'/orders', {
       method:'POST',
