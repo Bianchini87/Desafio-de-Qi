@@ -8,7 +8,7 @@ app.use(express.json({ limit: '100kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3000;
-const PRICE_CENTS = 25000;
+const PRICE_CENTS = 490;
 const PAGBANK_BASE = process.env.PAGBANK_ENV === 'sandbox'
   ? 'https://sandbox.api.pagseguro.com'
   : 'https://api.pagseguro.com';
